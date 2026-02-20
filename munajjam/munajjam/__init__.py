@@ -27,6 +27,12 @@ from munajjam.models import (
     Surah,
 )
 from munajjam.config import MunajjamSettings, get_settings, configure
+from munajjam.formatters import (
+    AlignmentOutput,
+    FormattedAyahResult,
+    AlignmentMetadata,
+    format_alignment_results,
+)
 from munajjam.exceptions import (
     MunajjamError,
     TranscriptionError,
@@ -51,6 +57,11 @@ __all__ = [
     "MunajjamSettings",
     "get_settings",
     "configure",
+    # Formatters
+    "AlignmentOutput",
+    "FormattedAyahResult",
+    "AlignmentMetadata",
+    "format_alignment_results",
     # Exceptions
     "MunajjamError",
     "TranscriptionError",
