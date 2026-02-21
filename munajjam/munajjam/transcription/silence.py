@@ -131,25 +131,83 @@ def detect_non_silent_chunks(
     min_silence_len: int = 300,
     silence_thresh: int = -30,
     use_fast: bool = True,
+    adaptive: bool = False,
+    expected_chunks: int | None = None,
+    min_chunks_ratio: float = 0.5,
 ) -> list[tuple[int, int]]:
     """
     Detect non-silent (speech) portions in an audio file.
+
+    Supports adaptive retry mode: when ``adaptive=True`` and the number of
+    detected chunks is fewer than ``min_chunks_ratio * expected_chunks``,
+    the function automatically retries with progressively relaxed thresholds
+    (lower ``silence_thresh`` and shorter ``min_silence_len``) until enough
+    chunks are found or all retry levels are exhausted.
 
     Args:
         audio_path: Path to the audio file
         min_silence_len: Minimum silence length in milliseconds
         silence_thresh: Silence threshold in dB
         use_fast: Use fast librosa-based detection (recommended for long files)
+        adaptive: Enable adaptive retry when too few chunks are detected.
+            Existing callers are unaffected because this defaults to ``False``.
+        expected_chunks: Expected number of non-silent chunks (e.g. ayah count).
+            Required when ``adaptive=True``; ignored otherwise.
+        min_chunks_ratio: Fraction of ``expected_chunks`` that must be found
+            before the adaptive retry stops (default 0.5 → at least 50 %).
 
     Returns:
         List of (start_ms, end_ms) tuples for non-silent portions
+    """
+    chunks = _detect_non_silent_chunks_raw(audio_path, min_silence_len, silence_thresh, use_fast)
+
+    if not adaptive or expected_chunks is None or expected_chunks <= 0:
+        return chunks
+
+    # Adaptive retry: relax thresholds progressively until we have enough chunks
+    # Each level relaxes the dB threshold (allow quieter sounds) and shortens
+    # the minimum silence length (detect shorter pauses).
+    retry_levels = [
+        # (silence_thresh_delta, min_silence_len_factor)
+        (-5, 0.75),   # level 1: slightly more sensitive
+        (-10, 0.5),   # level 2: moderately more sensitive
+        (-15, 0.35),  # level 3: quite sensitive
+        (-20, 0.25),  # level 4: very sensitive (last resort)
+    ]
+
+    min_required = int(min_chunks_ratio * expected_chunks)
+
+    for thresh_delta, len_factor in retry_levels:
+        if len(chunks) >= min_required:
+            break
+
+        relaxed_thresh = silence_thresh + thresh_delta  # e.g. -30 + (-5) = -35
+        relaxed_len = max(50, int(min_silence_len * len_factor))  # never below 50 ms
+
+        chunks = _detect_non_silent_chunks_raw(
+            audio_path, relaxed_len, relaxed_thresh, use_fast
+        )
+
+    return chunks
+
+
+def _detect_non_silent_chunks_raw(
+    audio_path: str | Path,
+    min_silence_len: int = 300,
+    silence_thresh: int = -30,
+    use_fast: bool = True,
+) -> list[tuple[int, int]]:
+    """
+    Internal helper: detect non-silent chunks with fixed thresholds.
+
+    Delegates to the fast (librosa) or accurate (pydub) backend.
     """
     if use_fast:
         try:
             return _detect_non_silent_fast(audio_path, min_silence_len, silence_thresh)
         except:  # noqa: E722 - Bare except to catch numpy/scipy C-extension errors
             pass  # Fallback to pydub
-    
+
     return _detect_non_silent_pydub(audio_path, min_silence_len, silence_thresh)
 
 
@@ -349,4 +407,3 @@ def extract_segment_audio(
     start_sample = int((start_ms / 1000) * sample_rate)
     end_sample = int((end_ms / 1000) * sample_rate)
     return waveform[start_sample:end_sample]
-
