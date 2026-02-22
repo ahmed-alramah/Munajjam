@@ -4,8 +4,7 @@ Audio segment data model.
 
 from enum import Enum
 
-from typing import Any
-from pydantic import BaseModel, Field, field_validator, ValidationInfo
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class WordTimestamp(BaseModel):
