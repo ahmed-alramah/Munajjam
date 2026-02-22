@@ -86,7 +86,6 @@ def _detect_silences_fast(
 
     # Calculate RMS energy per frame
     rms = librosa.feature.rms(y=y, frame_length=frame_length, hop_length=hop_length)[0]
-length)[0]
 
     # Normalize RMS to 0-1 range
     rms_max = np.max(rms) if np.max(rms) > 0 else 1.0
