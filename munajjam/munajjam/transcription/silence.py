@@ -162,9 +162,7 @@ def detect_non_silent_chunks(
     Returns:
         List of (start_ms, end_ms) tuples for non-silent portions
     """
-    chunks = _detect_non_silent_chunks_raw(
-        audio_path, min_silence_len, silence_thresh, use_fast
-    )
+    chunks = _detect_non_silent_chunks_raw(audio_path, min_silence_len, silence_thresh, use_fast)
 
     if not adaptive or expected_chunks is None or expected_chunks <= 0:
         return chunks
@@ -203,9 +201,7 @@ def detect_non_silent_chunks(
         )  # e.g. -30 + 5 = -25, capped at -10
         relaxed_len = max(50, int(min_silence_len * len_factor))  # never below 50 ms
 
-        chunks = _detect_non_silent_chunks_raw(
-            audio_path, relaxed_len, relaxed_thresh, use_fast
-        )
+        chunks = _detect_non_silent_chunks_raw(audio_path, relaxed_len, relaxed_thresh, use_fast)
         if len(chunks) > len(best_chunks):
             best_chunks = chunks
 
