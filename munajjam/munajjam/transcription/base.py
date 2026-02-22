@@ -71,9 +71,7 @@ class BaseTranscriber(ABC):
         segments = self.transcribe(audio_path)
         yield from segments
 
-    async def transcribe_stream_async(
-        self, audio_path: str | Path
-    ) -> AsyncIterator[Segment]:
+    async def transcribe_stream_async(self, audio_path: str | Path) -> AsyncIterator[Segment]:
         """
         Asynchronously transcribe and yield segments.
 
