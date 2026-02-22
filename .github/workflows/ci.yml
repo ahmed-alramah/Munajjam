@@ -22,23 +22,23 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
-        working-directory: ./munajjam
+        
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
 
       - name: Lint with ruff
-        working-directory: ./munajjam
+        
         run: |
           ruff check .
           ruff format --check .
 
       - name: Type check with mypy
-        working-directory: ./munajjam
+        
         run: mypy munajjam --ignore-missing-imports
 
       - name: Run tests
-        working-directory: ./munajjam
+        
         run: pytest
 
   build:
@@ -57,7 +57,7 @@ jobs:
         run: pip install build
 
       - name: Build package
-        working-directory: ./munajjam
+        
         run: python -m build
 
       - name: Upload build artifacts
