@@ -42,8 +42,7 @@ from munajjam.exceptions import (
     ModelNotLoadedError,
     QuranDataError,
 )
-
-__version__ = "2.0.0a1"
+from munajjam._version import __version__
 __all__ = [
     # Version
     "__version__",
