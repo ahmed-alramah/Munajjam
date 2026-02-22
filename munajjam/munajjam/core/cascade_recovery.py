@@ -159,16 +159,17 @@ def _recover_cascade_with_resync(
 
     # Backtrack and build new results
     path = []
-    current = best_end
+    current: tuple[int, int] | None = best_end
 
-    while current and current in dp:
+    while current is not None and current in dp:
         cost, merged_text, seg_start, parent = dp[current]
         i, j = current
 
         if parent is not None:
             path.append((seg_start, i, j, merged_text))
-
-        current = parent
+            current = parent
+        else:
+            current = None
 
     path.reverse()
 
@@ -253,7 +254,7 @@ def apply_cascade_recovery(
     segments: list[Segment],
     ayahs: list[Ayah],
     results: list[AlignmentResult],
-    silences_ms: list[tuple[int, int]] | None = None,
+    silences_ms: list[list[int] | tuple[int, int]] | None = None,
     cascade_threshold: float = 0.7,
     min_cascade_length: int = 2,
 ) -> list[AlignmentResult]:

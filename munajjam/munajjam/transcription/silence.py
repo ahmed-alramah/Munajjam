@@ -396,12 +396,14 @@ def load_audio_waveform(
     return y, sr
 
 
+from typing import Any
+
 def extract_segment_audio(
-    waveform,
+    waveform: Any,
     sample_rate: int,
     start_ms: int,
     end_ms: int,
-):
+) -> Any:
     """
     Extract a segment from a waveform.
 

@@ -210,7 +210,7 @@ def _word_alignment_cost(
 
 def _build_silence_bonus(
     words: list[TranscribedWord],
-    silences_ms: list[tuple[int, int]] | None,
+    silences_ms: list[list[int] | tuple[int, int]] | None,
     bonus: float = 0.15,
     penalty: float = 0.05,
 ) -> list[float]:
@@ -274,7 +274,7 @@ def align_words_dp(
     ref_words: list[list[str]],
     max_word_ratio: float = 3.0,
     beam_width: int = 50,
-    silences_ms: list[tuple[int, int]] | None = None,
+    silences_ms: list[list[int] | tuple[int, int]] | None = None,
 ) -> list[tuple[int, int, int]]:
     """
     Run DP at word granularity to find optimal word-to-ayah mapping.
@@ -332,7 +332,7 @@ def align_words_dp(
     backtrack: list[dict[int, int]] = []
 
     # Similarity cache keyed by (merged_text_hash, ayah_index)
-    _cost_cache: dict[tuple[int, int], float] = {}
+    _cost_cache: dict[tuple[int, int, float], float] = {}
 
     # Pre-compute normalised ayah texts for context matching
     ayah_norm_texts = [normalize_arabic(a.text) for a in ayahs]
@@ -472,26 +472,26 @@ def align_words_dp(
             _cost_cache.clear()
 
     # Find best ending
-    best_w = None
+    best_w: int | None = None
     best_cost = INF
 
-    for w, cost in dp_prev.items():
+    for w_key, cost in dp_prev.items():
         if cost < best_cost:
             best_cost = cost
-            best_w = w
+            best_w = w_key
 
     if best_w is None:
         return []
 
     # Backtrack
     assignments: list[tuple[int, int, int]] = []
-    w = best_w
-    for a in range(n_ayahs - 1, -1, -1):
-        prev_w = backtrack[a].get(w)
-        if prev_w is None:
+    cur_w: int = best_w
+    for a_bt in range(n_ayahs - 1, -1, -1):
+        prev_w_bt: int | None = backtrack[a_bt].get(cur_w)
+        if prev_w_bt is None:
             break
-        assignments.append((prev_w, w, a))
-        w = prev_w
+        assignments.append((prev_w_bt, cur_w, a_bt))
+        cur_w = prev_w_bt
 
     assignments.reverse()
     return assignments
@@ -509,7 +509,7 @@ def _chunked_align_words_dp(
     max_word_ratio: float = 3.0,
     chunk_size: int = 60,
     overlap: int = 10,
-    silences_ms: list[tuple[int, int]] | None = None,
+    silences_ms: list[list[int] | tuple[int, int]] | None = None,
 ) -> list[tuple[int, int, int]]:
     """
     Split large alignment problems into overlapping chunks and stitch results.
@@ -615,7 +615,7 @@ def _chunked_align_words_dp(
 def align_segments_word_dp(
     segments: list[Segment],
     ayahs: list[Ayah],
-    silences_ms: list[tuple[int, int]] | None = None,
+    silences_ms: list[list[int] | tuple[int, int]] | None = None,
     on_progress: Callable[[int, int], None] | None = None,
     max_word_ratio: float = 3.0,
 ) -> list[AlignmentResult]:

@@ -541,10 +541,10 @@ def realign_from_anchors(
     # Find gaps between anchors
     gaps = []
     prev_idx = -1
-    prev_result = None
+    prev_result: AlignmentResult | None = None
 
     for idx, result in anchors:
-        if prev_idx >= 0:
+        if prev_idx >= 0 and prev_result is not None:
             gap_size = idx - prev_idx - 1
             if gap_size >= min_gap_size:
                 gaps.append(
@@ -575,10 +575,10 @@ def realign_from_anchors(
 
     # Re-align each gap
     for gap in gaps:
-        start_idx = gap["start_idx"]
-        end_idx = gap["end_idx"]
-        time_start = max(0, gap["start_time"])
-        time_end = gap["end_time"]
+        start_idx = int(gap["start_idx"])
+        end_idx = int(gap["end_idx"])
+        time_start = max(0.0, float(gap["start_time"]))
+        time_end = float(gap["end_time"])
 
         # Get segments and ayahs for this gap
         gap_segments = [s for s in segments if s.start >= time_start and s.end <= time_end]
@@ -688,7 +688,7 @@ def fix_overlaps(results: list[AlignmentResult], min_gap: float = 0.0) -> int:
 
 def snap_boundaries_to_silences(
     results: list[AlignmentResult],
-    silences_ms: list[tuple[int, int]] | None,
+    silences_ms: list[list[int] | tuple[int, int]] | None,
     max_snap_distance: float = 2.0,
 ) -> int:
     """

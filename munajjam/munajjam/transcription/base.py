@@ -118,6 +118,6 @@ class BaseTranscriber(ABC):
         self.load()
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(self, exc_type: type | None, exc_val: BaseException | None, exc_tb: object | None) -> None:
         """Context manager exit - unloads the model."""
         self.unload()

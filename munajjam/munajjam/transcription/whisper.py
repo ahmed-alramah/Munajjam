@@ -7,7 +7,7 @@ Uses Tarteel AI's Whisper models fine-tuned for Quran recitation.
 import asyncio
 from collections.abc import Callable
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from munajjam.config import MunajjamSettings, get_settings
 from munajjam.core.arabic import detect_segment_type
@@ -64,8 +64,8 @@ class WhisperTranscriber(BaseTranscriber):
         self._model_type = model_type or self._settings.model_type
 
         # Model state
-        self._model = None
-        self._processor = None
+        self._model: Any = None
+        self._processor: Any = None
         self._resolved_device: str | None = None
 
     @property
@@ -281,7 +281,7 @@ class WhisperTranscriber(BaseTranscriber):
 
     def _transcribe_segment(
         self,
-        segment_audio,
+        segment_audio: Any,
         sample_rate: int,
         chunk_offset: float = 0.0,
     ) -> tuple[str, list[WordTimestamp] | None]:
@@ -301,7 +301,7 @@ class WhisperTranscriber(BaseTranscriber):
             text = self._transcribe_transformers(segment_audio, sample_rate)
             return text, None
 
-    def _transcribe_transformers(self, segment_audio, sample_rate: int) -> str:
+    def _transcribe_transformers(self, segment_audio: Any, sample_rate: int) -> str:
         """Transcribe using Transformers."""
         import io
         import logging
@@ -378,7 +378,7 @@ class WhisperTranscriber(BaseTranscriber):
                         )
 
                 text = self._processor.batch_decode(ids, skip_special_tokens=True)[0]
-                return text
+                return str(text)
             finally:
                 # Restore original logging levels
                 for logger, original_level in zip(
@@ -390,7 +390,7 @@ class WhisperTranscriber(BaseTranscriber):
 
     def _transcribe_faster_whisper(
         self,
-        segment_audio,
+        segment_audio: Any,
         sample_rate: int,
         chunk_offset: float = 0.0,
     ) -> tuple[str, list[WordTimestamp] | None]:
