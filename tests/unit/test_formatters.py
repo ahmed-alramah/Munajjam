@@ -66,10 +66,35 @@ def sample_results():
         _make_ayah(id=4, surah_id=1, ayah_number=4, text="مَالِكِ يَوْمِ الدِّينِ"),
     ]
     return [
-        _make_result(ayah=ayahs[0], start=0.0, end=5.32, transcribed="بسم الله الرحمن الرحيم", score=0.95),
-        _make_result(ayah=ayahs[1], start=5.32, end=10.15, transcribed="الحمد لله رب العالمين", score=0.92),
-        _make_result(ayah=ayahs[2], start=10.15, end=13.44, transcribed="الرحمن الرحيم", score=0.88),
-        _make_result(ayah=ayahs[3], start=13.44, end=17.00, transcribed="مالك يوم الدين", score=0.70, overlap=True),
+        _make_result(
+            ayah=ayahs[0],
+            start=0.0,
+            end=5.32,
+            transcribed="بسم الله الرحمن الرحيم",
+            score=0.95,
+        ),
+        _make_result(
+            ayah=ayahs[1],
+            start=5.32,
+            end=10.15,
+            transcribed="الحمد لله رب العالمين",
+            score=0.92,
+        ),
+        _make_result(
+            ayah=ayahs[2],
+            start=10.15,
+            end=13.44,
+            transcribed="الرحمن الرحيم",
+            score=0.88,
+        ),
+        _make_result(
+            ayah=ayahs[3],
+            start=13.44,
+            end=17.00,
+            transcribed="مالك يوم الدين",
+            score=0.70,
+            overlap=True,
+        ),
     ]
 
 
@@ -271,10 +296,18 @@ class TestAlignmentOutput:
         output = format_alignment_results(sample_results)
         data = output.to_dict()
         expected_keys = {
-            "id", "surah_id", "ayah_number", "ayah_index",
-            "start_time", "end_time", "duration",
-            "transcribed_text", "original_text",
-            "similarity_score", "is_high_confidence", "overlap_detected",
+            "id",
+            "surah_id",
+            "ayah_number",
+            "ayah_index",
+            "start_time",
+            "end_time",
+            "duration",
+            "transcribed_text",
+            "original_text",
+            "similarity_score",
+            "is_high_confidence",
+            "overlap_detected",
         }
         for result in data["results"]:
             assert set(result.keys()) == expected_keys
@@ -284,8 +317,14 @@ class TestAlignmentOutput:
         output = format_alignment_results(sample_results)
         data = output.to_dict()
         expected_keys = {
-            "munajjam_version", "generated_at", "surah_id", "reciter",
-            "audio_file", "total_ayahs", "total_duration",
-            "average_confidence", "high_confidence_count",
+            "munajjam_version",
+            "generated_at",
+            "surah_id",
+            "reciter",
+            "audio_file",
+            "total_ayahs",
+            "total_duration",
+            "average_confidence",
+            "high_confidence_count",
         }
         assert set(data["metadata"].keys()) == expected_keys

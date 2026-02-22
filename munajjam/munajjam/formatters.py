@@ -239,9 +239,7 @@ def format_alignment_results(
 
     total_duration = sum(r.duration for r in formatted)
     avg_confidence = (
-        sum(r.similarity_score for r in formatted) / len(formatted)
-        if formatted
-        else 0.0
+        sum(r.similarity_score for r in formatted) / len(formatted) if formatted else 0.0
     )
     high_conf_count = sum(1 for r in formatted if r.is_high_confidence)
 
