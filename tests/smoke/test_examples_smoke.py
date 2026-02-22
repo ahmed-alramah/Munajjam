@@ -12,21 +12,13 @@ Closes #48
 from __future__ import annotations
 
 
-import json
-import importlib
-import sys
-from pathlib import Path
-from typing import Iterator
-from unittest.mock import MagicMock, patch
 
 
-import pytest
 
 
 from munajjam.models import Segment, Ayah, AlignmentResult
 from munajjam.transcription.base import BaseTranscriber
-from munajjam.data import load_surah_ayahs
-from munajjam.core import align, Aligner, normalize_arabic, similarity
+from munajjam.core import Aligner, normalize_arabic, similarity
 
 
 
@@ -76,6 +68,12 @@ FAKE_SEGMENTS = [
         id=6,
         surah_id=1,
         text="اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ",
+        start=15.5,
+        end=19.0,
+    ),
+]
+
+
 # ---------------------------------------------------------------------------
 # Smoke test: advanced_alignment example pattern (02)
 # ---------------------------------------------------------------------------
