@@ -94,9 +94,9 @@ def _detect_silences_fast(
     is_silent = rms_normalized < amplitude_thresh
 
     # Convert to time-based regions
-    frame_times_ms = librosa.frames_to_time(
-        np.arange(len(rms)), sr=sr, hop_length=hop_length
-    ) * 1000
+    frame_times_ms = (
+        librosa.frames_to_time(np.arange(len(rms)), sr=sr, hop_length=hop_length) * 1000
+    )
 
     # Find contiguous silent regions
     silences = []
@@ -178,8 +178,8 @@ def detect_non_silent_chunks(
     # the minimum silence length (detect shorter pauses).
     retry_levels = [
         # (silence_thresh_delta, min_silence_len_factor)
-        (+5, 0.75),   # level 1: slightly more sensitive (raise thresh → more silence detected)
-        (+10, 0.5),   # level 2: moderately more sensitive
+        (+5, 0.75),  # level 1: slightly more sensitive (raise thresh → more silence detected)
+        (+10, 0.5),  # level 2: moderately more sensitive
         (+15, 0.35),  # level 3: quite sensitive
         (+20, 0.25),  # level 4: very sensitive (last resort)
     ]
@@ -192,12 +192,12 @@ def detect_non_silent_chunks(
         if len(best_chunks) >= min_required:
             break
 
-        relaxed_thresh = min(silence_thresh + thresh_delta, -10)  # e.g. -30 + 5 = -25, capped at -10
+        relaxed_thresh = min(
+            silence_thresh + thresh_delta, -10
+        )  # e.g. -30 + 5 = -25, capped at -10
         relaxed_len = max(50, int(min_silence_len * len_factor))  # never below 50 ms
 
-        chunks = _detect_non_silent_chunks_raw(
-            audio_path, relaxed_len, relaxed_thresh, use_fast
-        )
+        chunks = _detect_non_silent_chunks_raw(audio_path, relaxed_len, relaxed_thresh, use_fast)
         if len(chunks) > len(best_chunks):
             best_chunks = chunks
 
@@ -277,9 +277,9 @@ def _detect_non_silent_fast(
     # Find frames above threshold (non-silent)
     is_speech = rms_normalized >= amplitude_thresh
 
-    frame_times_ms = librosa.frames_to_time(
-        np.arange(len(rms)), sr=sr, hop_length=hop_length
-    ) * 1000
+    frame_times_ms = (
+        librosa.frames_to_time(np.arange(len(rms)), sr=sr, hop_length=hop_length) * 1000
+    )
 
     # Find contiguous speech regions
     chunks = []
@@ -366,10 +366,7 @@ def find_energy_minima(
     Returns:
         List of times (seconds) at local energy minima, sorted by energy (lowest first)
     """
-    candidates = [
-        (t, e) for t, e in envelope
-        if search_start <= t <= search_end
-    ]
+    candidates = [(t, e) for t, e in envelope if search_start <= t <= search_end]
 
     if not candidates:
         return []
