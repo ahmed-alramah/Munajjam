@@ -3,7 +3,7 @@ Unit tests for silence detection.
 """
 
 import pytest
-from unittest.mock import patch, call
+from unittest.mock import patch
 from munajjam.transcription.silence import detect_silences, detect_non_silent_chunks
 
 
@@ -87,3 +87,24 @@ class TestAdaptiveSilenceDetection:
         assert result == more_chunks
         # 1 initial call + 2 retries (third retry returns enough)
         assert mock_detect.call_count == 3
+
+    def test_adaptive_max_retries_exhausted(self):
+        """When all retry levels are exhausted, return the best result found."""
+        few_chunks = self._make_chunks(2)
+        slightly_more = self._make_chunks(3)
+
+        with patch(
+            "munajjam.transcription.silence._detect_non_silent_chunks_raw",
+            side_effect=[few_chunks, few_chunks, slightly_more, few_chunks, few_chunks],
+        ) as mock_detect:
+            result = detect_non_silent_chunks(
+                "dummy.wav",
+                adaptive=True,
+                expected_chunks=10,
+                min_chunks_ratio=0.5,
+            )
+
+        # Should return the best result (most chunks = slightly_more)
+        assert result == slightly_more
+        # 1 initial call + 4 retry levels = 5 total calls
+        assert mock_detect.call_count == 5

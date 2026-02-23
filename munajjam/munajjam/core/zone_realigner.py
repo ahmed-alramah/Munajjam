@@ -713,7 +713,7 @@ def snap_boundaries_to_silences(
     silences_sec = [(s / 1000.0, e / 1000.0) for s, e in silences_ms]
     silences_sec.sort(key=lambda x: x[0])
 
-    # Silence midpoints used for boundary snapping below
+    # Compute silence midpoints from silences_sec for boundary snapping
 
     # Sort results by ayah number
     results.sort(key=lambda r: r.ayah.ayah_number)
@@ -743,7 +743,7 @@ def snap_boundaries_to_silences(
                 best_silence_mid = sil_mid
                 best_silence = (sil_start, sil_end)
 
-        if best_silence_mid is not None and best_silence is not None:
+        if best_silence is not None:
             # Snap curr.end to silence start, next.start to silence end
             sil_start, sil_end = best_silence
 

@@ -198,9 +198,9 @@ def detect_non_silent_chunks(
         )  # e.g. -30 + 5 = -25, capped at -10
         relaxed_len = max(50, int(min_silence_len * len_factor))  # never below 50 ms
 
-        chunks = _detect_non_silent_chunks_raw(audio_path, relaxed_len, relaxed_thresh, use_fast)
-        if len(chunks) > len(best_chunks):
-            best_chunks = chunks
+        retried = _detect_non_silent_chunks_raw(audio_path, relaxed_len, relaxed_thresh, use_fast)
+        if len(retried) > len(best_chunks):
+            best_chunks = retried
 
     return best_chunks
 
