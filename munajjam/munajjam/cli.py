@@ -127,8 +127,7 @@ def _validate_surah_number(surah_num: int) -> None:
     """
     if not (MIN_SURAH <= surah_num <= MAX_SURAH):
         raise ValueError(
-            f"Invalid surah number: {surah_num}. "
-            f"Must be between {MIN_SURAH} and {MAX_SURAH}."
+            f"Invalid surah number: {surah_num}. Must be between {MIN_SURAH} and {MAX_SURAH}."
         )
 
 
@@ -173,16 +172,12 @@ def _format_results(results: list, fmt: str) -> str:
         for r in results:
             # Escape text for CSV (wrap in quotes if it contains commas)
             text = r.ayah.text.replace('"', '""')
-            lines.append(
-                f'{r.ayah.ayah_number},{r.start_time:.2f},{r.end_time:.2f},"{text}"'
-            )
+            lines.append(f'{r.ayah.ayah_number},{r.start_time:.2f},{r.end_time:.2f},"{text}"')
         return "\n".join(lines)
     else:  # text
         lines = []
         for r in results:
-            lines.append(
-                f"Ayah {r.ayah.ayah_number}: {r.start_time:.2f}s - {r.end_time:.2f}s"
-            )
+            lines.append(f"Ayah {r.ayah.ayah_number}: {r.start_time:.2f}s - {r.end_time:.2f}s")
         return "\n".join(lines)
 
 
@@ -278,9 +273,7 @@ def cmd_batch(args: argparse.Namespace) -> int:
 
                 segments = transcriber.transcribe(str(audio_file))
                 ayahs = load_surah_ayahs(surah_num)
-                results = align(
-                    str(audio_file), segments, ayahs, strategy=args.strategy
-                )
+                results = align(str(audio_file), segments, ayahs, strategy=args.strategy)
 
                 # Determine output extension
                 ext = {"json": ".json", "csv": ".csv", "text": ".txt"}[args.format]
@@ -291,15 +284,11 @@ def cmd_batch(args: argparse.Namespace) -> int:
                 print(f"  -> {output_path}", file=sys.stderr)
 
             except Exception as e:
-                print(
-                    f"  Error processing {audio_file.name}: {e}", file=sys.stderr
-                )
+                print(f"  Error processing {audio_file.name}: {e}", file=sys.stderr)
                 errors += 1
 
     total = len(audio_files)
-    print(
-        f"\nBatch complete: {total - errors}/{total} succeeded.", file=sys.stderr
-    )
+    print(f"\nBatch complete: {total - errors}/{total} succeeded.", file=sys.stderr)
     return 1 if errors > 0 else 0
 
 
